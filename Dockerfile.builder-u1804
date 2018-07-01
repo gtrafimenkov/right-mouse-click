@@ -1,10 +1,9 @@
-FROM debian:jessie-slim
+FROM ubuntu:18.04
 
 RUN apt-get update
 RUN apt-get install -y curl
 
-RUN curl -OL https://github.com/devops-toolkit/golang-deb-packages/releases/download/2018-02-24/golang_1.10.0.0_amd64.deb
-RUN dpkg -i golang_1.10.0.0_amd64.deb
+RUN apt-get install -y golang
 
 RUN apt-get install -y libc6-dev
 
@@ -21,7 +20,8 @@ RUN apt-get install -y git
 RUN apt-get install -y clang
 
 WORKDIR /go/src/rmc
+ENV GOPATH=/go
 COPY / ./
-RUN go get -u golang.org/x/vgo
-RUN cp .netrc ~/
-RUN ~/go/bin/vgo build
+RUN go get -u github.com/golang/dep/cmd/dep
+RUN /go/bin/dep ensure
+RUN go build

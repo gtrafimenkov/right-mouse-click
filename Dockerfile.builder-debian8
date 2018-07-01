@@ -1,0 +1,33 @@
+FROM debian:jessie-slim
+
+RUN apt-get update
+RUN apt-get install -y curl
+
+RUN echo "== installing golang..." \
+  && echo 'deb [arch=amd64] http://devops-toolkit.com/repo/golang/ debian main' | tee /etc/apt/sources.list.d/devops-toolkit-golang.list \
+  && gpg --keyserver keys.gnupg.net --recv-keys 7240349DEC7B5A96 \
+  && gpg -a --export 7240349DEC7B5A96 | apt-key add - \
+  && apt-get update \
+  && apt-get install golang-1.10 \
+  && echo "done"
+
+RUN apt-get install -y libc6-dev
+
+RUN apt-get install -y libx11-dev
+RUN apt-get install -y xorg-dev
+RUN apt-get install -y libxtst-dev libpng++-dev
+
+RUN apt-get install -y xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
+RUN apt-get install -y libxkbcommon-dev
+
+RUN apt-get install -y xsel
+RUN apt-get install -y xclip
+RUN apt-get install -y git
+RUN apt-get install -y build-essential
+
+WORKDIR /go/src/rmc
+ENV GOPATH=/go
+COPY / ./
+RUN go get -u github.com/golang/dep/cmd/dep
+RUN /go/bin/dep ensure
+RUN go build
